@@ -3,6 +3,7 @@ const server = new OSC.Server(8000, '127.0.0.1');  // Listening server
 const client = new OSC.Client('127.0.0.1', 8001);  // Client to send messages
 
 const numberOfCrowns = 5;
+const numberOfChannels = 8;  // Assuming 8 channels per crown as per the example data
 const frequency = 100; // Frequency in milliseconds
 const parameters = ['gamma', 'beta', 'alpha', 'theta', 'delta'];
 
@@ -17,18 +18,27 @@ const bandFrequencies = {
     'delta': [0.02, 0.03, 0.04, 0.05, 0.06]
 };
 
+// Helper function to generate an array of values for each band
+const generateBandData = (param, elapsedTime, crownId, channelIndex) => {
+    const frequency = bandFrequencies[param][crownId % bandFrequencies[param].length];
+    return (Math.sin(2 * Math.PI * frequency * elapsedTime + crownId + channelIndex) + 1) / 2; // Normalize to range [0, 1]
+};
+
 // Simulate sending data with oscillating values
 setInterval(() => {
     const elapsedTime = (Date.now() - startTime) / 5000; // Time in seconds
 
     for (let crownId = 1; crownId <= numberOfCrowns; crownId++) {
+        const data = {};
         parameters.forEach(param => {
-            let value;
-            const frequency = bandFrequencies[param][crownId - 1];
-            // Calculate the value using a sine wave for each band
-            value = (Math.sin(2 * Math.PI * frequency * elapsedTime) + 1) / 2; // Normalize to range [0, 1]
-            client.send(`/crown${crownId}/${param}`, value);
+            data[param] = [];
+            for (let channelIndex = 0; channelIndex < numberOfChannels; channelIndex++) {
+                const value = generateBandData(param, elapsedTime, crownId, channelIndex);
+                data[param].push(value);
+                client.send(`/crown${crownId}/${param}`, value);
+            }
         });
+        console.log(`Crown ${crownId} data:`, data);
     }
 }, frequency);
 
