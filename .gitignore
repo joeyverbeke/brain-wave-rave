@@ -2,3 +2,4 @@ package-lock.json
 node_modules/
 Backup/
 brain-wave-rave.toe
+.DS_Store
