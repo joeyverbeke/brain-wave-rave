@@ -36,9 +36,10 @@ setInterval(() => {
                 const value = generateBandData(param, elapsedTime, crownId, channelIndex);
                 data[param].push(value);
                 client.send(`/crown${crownId}/${param}`, value);
+                console.log(`/crown${crownId}/${param}`, value);
             }
         });
-        console.log(`Crown ${crownId} data:`, data);
+        //console.log(`Crown ${crownId} data:`, data);
     }
 }, frequency);
 
