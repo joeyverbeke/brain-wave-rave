@@ -2,7 +2,7 @@ const OSC = require('node-osc');
 const server = new OSC.Server(8000, '127.0.0.1');  // Listening server
 const client = new OSC.Client('127.0.0.1', 8001);  // Client to send messages
 
-const numberOfCrowns = 5;
+const numberOfCrowns = 4;
 const numberOfChannels = 8;  // Assuming 8 channels per crown as per the example data
 const frequency = 100; // Frequency in milliseconds
 const parameters = ['gamma', 'beta', 'alpha', 'theta', 'delta'];
