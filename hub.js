@@ -8,18 +8,22 @@ const crownTimeout = 5000; // 5 seconds timeout
 
 oscServer.on('message', (msg) => {
     // console.log(msg);
-    if (msg[0].includes('/battery')) {
-        const crownName = msg[0].split('/')[1];
-        activeCrowns[crownName].battery = msg[1];
-    } else if (msg[0].includes('/signalQuality')) {
-        const crownName = msg[0].split('/')[1];
-        activeCrowns[crownName].signalQuality = msg[1];
-    } else if (msg[0].startsWith('/crown') && msg[0].includes('/gamma')) {
+    if (msg[0].startsWith('/crown') && msg[0].includes('/gamma')) {
         const crownName = msg[0].split('/')[1]; // Extract crown name from the message
         if (!activeCrowns[crownName]) {
             activeCrowns[crownName] = { signalQuality: 0, battery: 0 };
         }
         activeCrowns[crownName].lastSeen = Date.now(); // Update the last seen time for this crown gamma
+    } else if (msg[0].includes('/battery')) {
+        const crownName = msg[0].split('/')[1];
+        if (activeCrowns[crownName]) {
+            activeCrowns[crownName].battery = msg[1];
+        }
+    } else if (msg[0].includes('/signalQuality')) {
+        const crownName = msg[0].split('/')[1];
+        if (activeCrowns[crownName]) {
+            activeCrowns[crownName].signalQuality = msg[1];
+        }
     }
 });
 
@@ -65,6 +69,7 @@ const server = http.createServer((req, res) => {
     } else if (req.url === '/script.js') {
         fs.readFile(path.join(__dirname, 'script.js'), (err, content) => {
             if (err) {
+                console.error('Error reading script.js:', err);
                 res.writeHead(500);
                 res.end('Error loading script.js');
             } else {
